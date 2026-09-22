@@ -113,6 +113,13 @@ impl VhostUserSoundThread {
                 if !vring.enable_notification().unwrap() {
                     break;
                 }
+                if *queue_idx == QueueIdx::Event {
+                    // No processing is currently done on descriptors received 
+                    // via the event queue, so next_avail never progresses. This
+                    // break prevents an inifinite loop if a kick is received for
+                    // the event queue.
+                    break;
+                }
             }
         } else {
             // Without EVENT_IDX, a single call is enough.
